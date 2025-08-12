@@ -7,17 +7,17 @@ const rateLimit = require("express-rate-limit");
 const path = require("path");
 
 // Load env vars
-dotenv.config();
+dotenv.config({ path: __dirname + "/.env" });
 
 const connectDB = require("./config/database");
 
 // Route imports
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
-const employeeRoutes = require("./routes/employees");
-const customerRoutes = require("./routes/customers");
-const agentRoutes = require("./routes/agents");
-const accountRoutes = require("./routes/accounts");
+// const employeeRoutes = require("./routes/employees");
+// const customerRoutes = require("./routes/customers");
+// const agentRoutes = require("./routes/agents");
+// const accountRoutes = require("./routes/accounts");
 
 // Connect to database
 connectDB();
@@ -60,10 +60,10 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/employees", employeeRoutes);
-app.use("/api/customers", customerRoutes);
-app.use("/api/agents", agentRoutes);
-app.use("/api/accounts", accountRoutes);
+// app.use("/api/employees", employeeRoutes);
+// app.use("/api/customers", customerRoutes);
+// app.use("/api/agents", agentRoutes);
+// app.use("/api/accounts", accountRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -76,8 +76,6 @@ app.get("/api/health", (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-
   if (err.name === "ValidationError") {
     const errors = Object.values(err.errors).map((e) => e.message);
     return res.status(400).json({ message: "Validation Error", errors });
