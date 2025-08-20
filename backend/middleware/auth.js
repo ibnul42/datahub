@@ -38,4 +38,19 @@ const adminAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { auth, adminAuth };
+const roleAuth =
+  (roles = []) =>
+  async (req, res, next) => {
+    try {
+      await auth(req, res, () => {
+        if (!roles.includes(req.user.role)) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+        next();
+      });
+    } catch {
+      res.status(403).json({ message: "Access denied" });
+    }
+  };
+
+module.exports = { auth, adminAuth, roleAuth };

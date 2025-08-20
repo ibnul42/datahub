@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const { validationResult } = require('express-validator');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const { validationResult } = require("express-validator");
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -23,11 +23,11 @@ const register = async (req, res) => {
 
     // Check if user exists
     const existingUser = await User.findOne({
-      $or: [{ email }, { username }, { employeeId }]
+      $or: [{ email }, { username }, { employeeId }],
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     // Create user
@@ -36,7 +36,7 @@ const register = async (req, res) => {
       username,
       email,
       password,
-      role: role || 'user'
+      role: role || "user",
     });
 
     const token = generateToken(user._id);
@@ -50,12 +50,12 @@ const register = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        status: user.status
-      }
+        status: user.status,
+      },
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -75,16 +75,18 @@ const login = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    if (user.status === 'inactive') {
-      return res.status(401).json({ message: 'Account is inactive' });
+    if (user.status === "inactive") {
+      return res.status(401).json({ message: "Account is inactive" });
     }
 
     // Update last login
-    user.lastLogin = new Date();
-    await user.save();
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id,
+      { lastLogin: new Date() }
+    );
 
     const token = generateToken(user._id);
 
@@ -98,12 +100,12 @@ const login = async (req, res) => {
         email: user.email,
         role: user.role,
         status: user.status,
-        lastLogin: user.lastLogin
-      }
+        lastLogin: user.lastLogin,
+      },
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -112,19 +114,19 @@ const login = async (req, res) => {
 // @access  Private
 const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select("-password");
     res.json({
       success: true,
-      user
+      user,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 module.exports = {
   register,
   login,
-  getMe
+  getMe,
 };

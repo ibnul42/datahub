@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "@/context/AuthContext";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -26,18 +27,20 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} antialiased flex flex-col min-h-screen overscroll-x-none overflow-y-auto`}
       >
-        <Header />
-        <main className="flex-1 flex">
-          <div className="flex-1 bg-gray-50">{children}</div>
-        </main>
-        <Footer />
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          pauseOnHover
-          draggable
-        />
+        <AuthProvider>
+          <Header />
+          <main className="flex-1 flex">
+            <div className="flex-1 bg-gray-50">{children}</div>
+          </main>
+          <Footer />
+          <ToastContainer
+            position="top-center"
+            autoClose={3000}
+            hideProgressBar={false}
+            pauseOnHover
+            draggable
+          />
+        </AuthProvider>
       </body>
     </html>
   );

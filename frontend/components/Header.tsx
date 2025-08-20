@@ -2,21 +2,30 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useLogout } from "@/hooks/useLogout";
+import { useAuthContext } from "@/context/AuthContext"; // ✅ use context
 
-export default function Header({}) {
-  const { logout } = useLogout();
-
+export default function Header() {
+  const { user, setUser } = useAuthContext(); // ✅ Access global user
   const [isOpen, setIsOpen] = useState(false);
 
+  // ✅ Logout handler
+  function handleLogout() {
+    localStorage.removeItem("token"); // remove token
+    setUser(null); // clear global user state
+  }
+
   const navLinks = [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Users", href: "/users" },
-    { label: "Remittance Customer", href: "/customers" },
-    { label: "Employee Records", href: "/employees" },
-    { label: "m-Cash Agent Record", href: "/agents" },
-    { label: "Customer Record", href: "/accounts" },
+    { label: "Dashboard", href: "/dashboard", roles: ["admin"] },
+    { label: "Users", href: "/users", roles: ["admin"] },
+    { label: "Remittance Customer", href: "/customers", roles: ["admin"] },
+    { label: "Employee Records", href: "/employees", roles: ["admin"] },
+    { label: "m-Cash Agent Record", href: "/agents", roles: ["admin"] },
+    { label: "Customer Record", href: "/accounts", roles: ["admin", "user"] },
   ];
+
+  // const filteredLinks = user
+  //   ? navLinks.filter((link) => link.roles.includes(user.role))
+  //   : [];
 
   return (
     <header className="bg-white shadow-lg border-b-2 border-blue-500">
@@ -40,12 +49,22 @@ export default function Header({}) {
                 {link.label}
               </Link>
             ))}
-            <button
-              onClick={logout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
-            >
-              Logout
-            </button>
+
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+              >
+                Login
+              </Link>
+            )}
           </nav>
 
           {/* Mobile menu toggle */}
@@ -73,12 +92,22 @@ export default function Header({}) {
                 {link.label}
               </Link>
             ))}
-            <button
-              onClick={logout}
-              className="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Logout
-            </button>
+
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="w-full block text-center bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-md text-sm font-medium text-white"
+              >
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       )}

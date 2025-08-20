@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthContext } from "@/context/AuthContext"; // ✅ use global auth context
 import Spinner from "@/components/Spinner";
 import { useRouter } from "next/navigation";
 import { useEffect, ReactNode } from "react";
@@ -10,7 +10,7 @@ interface WithAuthProps {
 }
 
 export default function WithAuth({ children }: WithAuthProps) {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthContext();
   const router = useRouter();
 
   useEffect(() => {

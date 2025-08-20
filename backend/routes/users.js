@@ -7,17 +7,20 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/userController");
-const { auth, adminAuth } = require("../middleware/auth");
+const { auth, adminAuth, roleAuth } = require("../middleware/auth");
+const { roles, manageRoles } = require("../constants/roles");
 
 const router = express.Router();
 
 // All routes require admin access
-router.use(adminAuth);
+router.use(roleAuth(roles));
 
-router.get("/", getUsers);
+router.get("/", roleAuth(['admin']), getUsers);
+
 router.get("/:id", getUser);
 router.post(
   "/",
+  roleAuth(['admin']),
   [
     body("employeeId").notEmpty().withMessage("Employee ID is required"),
     body("username")
@@ -31,7 +34,7 @@ router.post(
   ],
   createUser
 );
-router.put("/:id", updateUser);
-router.delete("/:id", deleteUser);
+router.put("/:id", roleAuth(['admin']), updateUser);
+router.delete("/:id", roleAuth(['admin']), deleteUser);
 
 module.exports = router;

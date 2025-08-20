@@ -1,23 +1,23 @@
 "use client";
-import { useState, FormEvent } from "react";
+
+import { useState, FormEvent, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 import Link from "next/link";
+import { useAuthContext } from "@/context/AuthContext"; // ✅ Import context
 
 interface LoginFormProps {
-  onSwitchToRegister?: () => void; // optional callback to switch forms if needed
+  onSwitchToRegister?: () => void;
 }
 
 export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setUser } = useAuthContext(); // ✅ Access setUser from context
 
-  // Form state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  // Show success toast if coming from registration page (with ?registered=true)
   useEffect(() => {
     if (searchParams.get("registered")) {
       toast.success("Registered successfully! Please login.");
@@ -28,7 +28,7 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch("http://localhost:5001/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -50,12 +50,15 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
         return;
       }
 
-      toast.success(`Welcome back, ${data.user.username}!`);
-
-      // Save token (adjust to your auth management)
+      // ✅ Save token in localStorage
       localStorage.setItem("token", data.token);
 
-      // Redirect to dashboard or homepage
+      // ✅ Update global user state immediately
+      setUser(data.user);
+
+      toast.success(`Welcome back, ${data.user.username}!`);
+
+      // ✅ Redirect without reload
       router.push("/dashboard");
     } catch {
       toast.error("Failed to login. Please try again later.");
