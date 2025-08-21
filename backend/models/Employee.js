@@ -40,7 +40,8 @@ const employeeSchema = new mongoose.Schema({
       'Desk Officer',
       'Cashier',
       'Investment Worker',
-      'Peon/Security Guard'
+      'Peon/Security Guard',
+      'admin'
     ]
   },
   joiningDate: {

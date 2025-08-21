@@ -1,5 +1,6 @@
-const Employee = require('../models/Employee');
-const { validationResult } = require('express-validator');
+const { default: mongoose } = require("mongoose");
+const Employee = require("../models/Employee");
+const { validationResult } = require("express-validator");
 
 // @desc    Get all employees
 // @route   GET /api/employees
@@ -10,11 +11,11 @@ const getEmployees = async (req, res) => {
     res.json({
       success: true,
       count: employees.length,
-      data: employees
+      data: employees,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -23,19 +24,24 @@ const getEmployees = async (req, res) => {
 // @access  Private/Admin
 const getEmployee = async (req, res) => {
   try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Employee ID" });
+    }
     const employee = await Employee.findById(req.params.id);
-    
+
     if (!employee) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({ message: "Employee not found" });
     }
 
     res.json({
       success: true,
-      data: employee
+      data: employee,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -46,21 +52,27 @@ const createEmployee = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors.array(),
+      });
     }
 
     const employee = await Employee.create(req.body);
 
     res.status(201).json({
       success: true,
-      data: employee
+      data: employee,
     });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ message: 'Duplicate employee ID or email' });
+      return res
+        .status(400)
+        .json({ message: "Duplicate employee ID or email" });
     }
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -69,23 +81,28 @@ const createEmployee = async (req, res) => {
 // @access  Private/Admin
 const updateEmployee = async (req, res) => {
   try {
-    const employee = await Employee.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Employee ID" });
+    }
+
+    const employee = await Employee.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!employee) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({ message: "Employee not found" });
     }
 
     res.json({
       success: true,
-      data: employee
+      data: employee,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -94,19 +111,24 @@ const updateEmployee = async (req, res) => {
 // @access  Private/Admin
 const deleteEmployee = async (req, res) => {
   try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Employee ID" });
+    }
     const employee = await Employee.findByIdAndDelete(req.params.id);
 
     if (!employee) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({ message: "Employee not found" });
     }
 
     res.json({
       success: true,
-      message: 'Employee deleted successfully'
+      message: "Employee deleted successfully",
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -115,5 +137,5 @@ module.exports = {
   getEmployee,
   createEmployee,
   updateEmployee,
-  deleteEmployee
+  deleteEmployee,
 };

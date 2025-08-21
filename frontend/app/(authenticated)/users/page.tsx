@@ -5,7 +5,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 
 export default function UsersPage() {
-  const { user } = useAuthContext(); // Logged-in user
+  const { user } = useAuthContext();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -31,7 +31,7 @@ export default function UsersPage() {
       }
 
       try {
-        const res = await fetch("http://localhost:5001/api/users", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export default function UsersPage() {
     const token = localStorage.getItem("token");
     setCreating(true); // disable button
     try {
-      const res = await fetch("http://localhost:5001/api/users", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -156,7 +156,7 @@ export default function UsersPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5001/api/users/${selectedUser._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${selectedUser._id}`,
         {
           method: "PUT",
           headers: {
@@ -214,7 +214,7 @@ export default function UsersPage() {
 
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:5001/api/users/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -240,7 +240,7 @@ export default function UsersPage() {
     });
   };
 
-  // ✅ Role check helpers
+  // ✅ Role check
   const canManageUsers = user && adminRoles.includes(user.role);
 
   return (
