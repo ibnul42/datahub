@@ -15,7 +15,7 @@ const connectDB = require("./config/database");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const employeeRoutes = require("./routes/employees");
-// const customerRoutes = require("./routes/customers");
+const customerRoutes = require("./routes/customers");
 // const agentRoutes = require("./routes/agents");
 // const accountRoutes = require("./routes/accounts");
 
@@ -61,7 +61,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/employees", employeeRoutes);
-// app.use("/api/customers", customerRoutes);
+app.use("/api/customers", customerRoutes);
 // app.use("/api/agents", agentRoutes);
 // app.use("/api/accounts", accountRoutes);
 

@@ -8,13 +8,13 @@ const {
   uploadCustomerNID,
   deleteCustomer,
 } = require("../controllers/customerController");
-const { auth } = require("../middleware/auth");
+const { auth, roleAuth } = require("../middleware/auth");
 const upload = require("../config/multer");
 
 const router = express.Router();
 
 // All routes require authentication
-router.use(auth);
+router.use(roleAuth(['admin']));
 
 router.get("/", getCustomers);
 router.get("/nid/:nidNumber", getCustomerByNID);
