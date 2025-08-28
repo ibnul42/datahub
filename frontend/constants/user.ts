@@ -29,4 +29,13 @@ export const manageRoles = [
   "admin",
 ];
 
+export const customerCrud = [
+  "In-Charge",
+  "Assistance In-Charge",
+  "Cash In-charge",
+  "Senior Desk Officer(SDO)",
+  "Desk Officer(DO)",
+  "admin",
+];
+
 export const adminRoles = ["admin"];

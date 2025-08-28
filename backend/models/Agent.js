@@ -36,14 +36,18 @@ const agentSchema = new mongoose.Schema({
     enum: ['Active', 'Inactive', 'Suspended'],
     default: 'Active'
   },
-  documents: {
-    nid: { type: Boolean, default: false },
-    photo: { type: Boolean, default: false }
+  // Changed from 'documents' to be consistent with file naming
+  nidUploaded: {
+    type: Boolean,
+    default: false
   },
-  documentFiles: {
-    nid: String,
-    photo: String
+  photoUploaded: {
+    type: Boolean,
+    default: false
   },
+  // Changed from 'documentFiles' to match customer pattern
+  nidFile: String,
+  photo: String,
   registrationDate: {
     type: Date,
     default: Date.now

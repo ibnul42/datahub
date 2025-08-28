@@ -7,17 +7,18 @@ const {
   updateCustomer,
   uploadCustomerNID,
   deleteCustomer,
+  uploadCustomerPhoto,
 } = require("../controllers/customerController");
 const { auth, roleAuth } = require("../middleware/auth");
 const upload = require("../config/multer");
+const { roles, customerCrud } = require("../constants/roles");
 
 const router = express.Router();
 
-// All routes require authentication
-router.use(roleAuth(['admin']));
-
+router.use(roleAuth(roles));
 router.get("/", getCustomers);
 router.get("/nid/:nidNumber", getCustomerByNID);
+router.use(roleAuth(customerCrud));
 router.post(
   "/",
   [
@@ -30,7 +31,8 @@ router.post(
   createCustomer
 );
 router.put("/:id", updateCustomer);
-router.post("/:id/upload-nid", upload.single("nid"), uploadCustomerNID);
+router.post("/:id/upload-nid", upload.uploadNID.single("nid"), uploadCustomerNID);
+router.post("/:id/upload-photo", upload.uploadPhoto.single("photo"), uploadCustomerPhoto);
 router.delete("/:id", deleteCustomer);
 
 module.exports = router;

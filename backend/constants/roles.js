@@ -18,4 +18,13 @@ const manageRoles = [
   "admin",
 ];
 
-module.exports = { roles, manageRoles };
+const customerCrud = [
+  "In-Charge",
+  "Assistance In-Charge",
+  "Cash In-charge",
+  "Senior Desk Officer(SDO)",
+  "Desk Officer(DO)",
+  "admin",
+];
+
+module.exports = { roles, manageRoles, customerCrud };

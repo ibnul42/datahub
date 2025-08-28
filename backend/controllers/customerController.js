@@ -125,6 +125,39 @@ const uploadCustomerNID = async (req, res) => {
   }
 };
 
+// @desc    Upload customers photo
+// @route   POST /api/customers/:id/upload-photo
+// @access  Private
+const uploadCustomerPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const customer = await Customer.findByIdAndUpdate(
+      req.params.id,
+      {
+        photo: req.file.filename,
+        photoUploaded: true,
+      },
+      { new: true }
+    );
+
+    if (!customer) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.json({
+      success: true,
+      data: customer,
+      message: "Photo uploaded successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 // @desc    Delete customer
 // @route   DELETE /api/customers/:id
 // @access  Private
@@ -152,5 +185,6 @@ module.exports = {
   createCustomer,
   updateCustomer,
   uploadCustomerNID,
+  uploadCustomerPhoto,
   deleteCustomer,
 };

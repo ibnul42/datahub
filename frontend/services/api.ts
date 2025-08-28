@@ -4,6 +4,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/a
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
 });
 
 // Add auth token to requests
@@ -11,6 +12,10 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  // Ensure Content-Type is set correctly for FormData
+  if (config.data instanceof FormData) {
+    config.headers['Content-Type'] = 'multipart/form-data';
   }
   return config;
 });

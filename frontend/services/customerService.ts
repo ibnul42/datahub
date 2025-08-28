@@ -39,6 +39,19 @@ export const customerService = {
     return response.data;
   },
 
+  // Upload Photo
+  uploadPhoto: async (id: string, file: File): Promise<{ data: Customer }> => {
+    const formData = new FormData();
+    formData.append('photo', file);
+    
+    const response = await api.post(`/customers/${id}/upload-photo`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
   // Delete customer
   deleteCustomer: async (id: string): Promise<void> => {
     await api.delete(`/customers/${id}`);

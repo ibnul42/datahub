@@ -7,6 +7,8 @@ export interface Customer {
   address: string;
   nidUploaded: boolean;
   nidFile?: string;
+  photo?: string;
+  photoUploaded?: boolean;
   registrationDate: string;
 }
 

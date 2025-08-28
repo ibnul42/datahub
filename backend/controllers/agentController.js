@@ -89,7 +89,73 @@ const updateAgent = async (req, res) => {
   }
 };
 
-// @desc    Upload agent documents
+// @desc    Upload agent NID
+// @route   POST /api/agents/:id/upload-nid
+// @access  Private
+const uploadAgentNID = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No NID file uploaded' });
+    }
+
+    const agent = await Agent.findByIdAndUpdate(
+      req.params.id,
+      {
+        'documentFiles.nid': req.file.filename,
+        'documents.nid': true,
+      },
+      { new: true }
+    );
+
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent not found' });
+    }
+
+    res.json({
+      success: true,
+      data: agent,
+      message: 'NID uploaded successfully'
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Upload agent photo
+// @route   POST /api/agents/:id/upload-photo
+// @access  Private
+const uploadAgentPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No photo file uploaded' });
+    }
+
+    const agent = await Agent.findByIdAndUpdate(
+      req.params.id,
+      {
+        'documentFiles.photo': req.file.filename,
+        'documents.photo': true,
+      },
+      { new: true }
+    );
+
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent not found' });
+    }
+
+    res.json({
+      success: true,
+      data: agent,
+      message: 'Photo uploaded successfully'
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Upload agent documents (both NID and photo)
 // @route   POST /api/agents/:id/upload-documents
 // @access  Private
 const uploadAgentDocuments = async (req, res) => {
@@ -106,6 +172,10 @@ const uploadAgentDocuments = async (req, res) => {
     if (req.files.photo) {
       updates['documentFiles.photo'] = req.files.photo[0].filename;
       updates['documents.photo'] = true;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: 'No valid files uploaded' });
     }
 
     const agent = await Agent.findByIdAndUpdate(req.params.id, updates, { new: true });
@@ -151,6 +221,8 @@ module.exports = {
   getAgentByMobile,
   createAgent,
   updateAgent,
+  uploadAgentNID, // Add new export
+  uploadAgentPhoto, // Add new export
   uploadAgentDocuments,
   deleteAgent
 };

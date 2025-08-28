@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthContext } from "@/context/AuthContext";
 import { Customer } from "./types";
 
 interface CustomerTableProps {
@@ -8,6 +7,7 @@ interface CustomerTableProps {
   onEdit: (customer: Customer) => void;
   onDelete: (id: string) => void;
   loading?: boolean;
+  actionOption: boolean;
 }
 
 export default function CustomerTable({
@@ -15,9 +15,8 @@ export default function CustomerTable({
   onEdit,
   onDelete,
   loading = false,
+  actionOption = false,
 }: CustomerTableProps) {
-  const { user } = useAuthContext();
-  console.log(user);
   if (loading) {
     return (
       <div className="bg-white shadow-lg rounded-lg p-6">
@@ -39,9 +38,12 @@ export default function CustomerTable({
         </h3>
         <div className="text-center py-8 border border-gray-200 rounded-md">
           <div className="text-gray-500 text-lg mb-2">No customers found</div>
-          <p className="text-gray-400">
-            Start by adding your first customer using the "New Customer" button
-          </p>
+          {actionOption && (
+            <p className="text-gray-400">
+              Start by adding your first customer using the &quot;New Customer&quot;
+              button
+            </p>
+          )}
         </div>
       </div>
     );
@@ -59,7 +61,7 @@ export default function CustomerTable({
             <th className="px-4 py-2 border">Name</th>
             <th className="px-4 py-2 border">Mobile</th>
             <th className="px-4 py-2 border">NID Status</th>
-            <th className="px-4 py-2 border">Actions</th>
+            {actionOption && <th className="px-4 py-2 border">Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -71,20 +73,22 @@ export default function CustomerTable({
               <td className="px-4 py-2 border">
                 {cust.nidUploaded ? "✅ Verified" : "⏳ Pending"}
               </td>
-              <td className="px-4 py-2 border flex space-x-2">
-                <button
-                  onClick={() => onEdit(cust)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => onDelete(cust._id)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
-                >
-                  Delete
-                </button>
-              </td>
+              {actionOption && (
+                <td className="px-4 py-2 border flex space-x-2">
+                  <button
+                    onClick={() => onEdit(cust)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => onDelete(cust._id)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -1,11 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useCustomers } from '@/hooks/useCustomers';
-import { Customer, CustomerFormData } from '@/components/customers/types';
-import CustomerModal from '@/components/customers/CustomerModal';
-import CustomerTable from '@/components/customers/CustomerTable';
-import CustomerSearch from '@/components/customers/CustomerSearch';
+import { useState } from "react";
+import { useCustomers } from "@/hooks/useCustomers";
+import { Customer, CustomerFormData } from "@/components/customers/types";
+import CustomerModal from "@/components/customers/CustomerModal";
+import CustomerTable from "@/components/customers/CustomerTable";
+import CustomerSearch from "@/components/customers/CustomerSearch";
+import { useAuthContext } from "@/context/AuthContext";
+import { customerCrud } from "@/constants/user";
 
 export default function RemittanceCustomerPage() {
   const {
@@ -16,13 +18,20 @@ export default function RemittanceCustomerPage() {
     updateCustomer,
     deleteCustomer,
     uploadNID,
+    uploadPhoto,
   } = useCustomers();
+  const { user } = useAuthContext();
 
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
 
+  const crudAccess = Boolean(user?.role && customerCrud.includes(user.role));
+
   const openModal = (customer?: Customer) => {
+    console.log(customer);
     setSelectedCustomer(customer || null);
     setIsModalOpen(true);
   };
@@ -32,20 +41,32 @@ export default function RemittanceCustomerPage() {
     setIsModalOpen(false);
   };
 
-  const handleSubmit = async (data: CustomerFormData, file?: File | null) => {
+  // Update the onSubmit function to accept photoFile
+  // page.tsx
+  const handleSubmit = async (
+    data: CustomerFormData,
+    nidFile?: File | null,
+    photoFile?: File | null
+  ) => {
     setModalLoading(true);
     try {
       if (selectedCustomer) {
         // Update existing customer
         await updateCustomer(selectedCustomer._id, data);
-        if (file) {
-          await uploadNID(selectedCustomer._id, file);
+        if (nidFile) {
+          await uploadNID(selectedCustomer._id, nidFile);
+        }
+        if (photoFile) {
+          await uploadPhoto(selectedCustomer._id, photoFile);
         }
       } else {
         // Create new customer
         const newCustomer = await createCustomer(data);
-        if (file) {
-          await uploadNID(newCustomer._id, file);
+        if (nidFile) {
+          await uploadNID(newCustomer._id, nidFile);
+        }
+        if (photoFile) {
+          await uploadPhoto(newCustomer._id, photoFile);
         }
       }
     } finally {
@@ -54,11 +75,11 @@ export default function RemittanceCustomerPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this customer?')) return;
+    if (!confirm("Are you sure you want to delete this customer?")) return;
     try {
       await deleteCustomer(id);
     } catch (error) {
-      alert('Failed to delete customer');
+      alert("Failed to delete customer");
     }
   };
 
@@ -76,12 +97,14 @@ export default function RemittanceCustomerPage() {
           </h2>
           <p className="text-gray-600">Manage remittance customer records</p>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
-        >
-          ➕ New Customer
-        </button>
+        {crudAccess && (
+          <button
+            onClick={() => openModal()}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer"
+          >
+            ➕ New Customer
+          </button>
+        )}
       </div>
 
       {error && (
@@ -100,6 +123,7 @@ export default function RemittanceCustomerPage() {
       ) : (
         <CustomerTable
           customers={customers}
+          actionOption={crudAccess}
           onEdit={openModal}
           onDelete={handleDelete}
         />
@@ -111,6 +135,10 @@ export default function RemittanceCustomerPage() {
         customer={selectedCustomer}
         onSubmit={handleSubmit}
         loading={modalLoading}
+        baseUrl={
+          process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
+          "http://localhost:5000"
+        }
       />
     </div>
   );

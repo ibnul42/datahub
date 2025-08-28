@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Customer, CustomerFormData } from '@/components/customers/types';
-import { customerService } from '@/services/customerService';
+// useCustomers.ts
+import { useState, useEffect } from "react";
+import { Customer, CustomerFormData } from "@/components/customers/types";
+import { customerService } from "@/services/customerService";
 
 export const useCustomers = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -14,7 +15,7 @@ export const useCustomers = () => {
       const response = await customerService.getCustomers();
       setCustomers(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch customers');
+      setError(err.response?.data?.message || "Failed to fetch customers");
     } finally {
       setLoading(false);
     }
@@ -24,24 +25,27 @@ export const useCustomers = () => {
     try {
       setError(null);
       const response = await customerService.createCustomer(customerData);
-      setCustomers(prev => [response.data, ...prev]);
+      setCustomers((prev) => [response.data, ...prev]);
       return response.data;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create customer');
+      setError(err.response?.data?.message || "Failed to create customer");
       throw err;
     }
   };
 
-  const updateCustomer = async (id: string, customerData: Partial<CustomerFormData>) => {
+  const updateCustomer = async (
+    id: string,
+    customerData: Partial<CustomerFormData>
+  ) => {
     try {
       setError(null);
       const response = await customerService.updateCustomer(id, customerData);
-      setCustomers(prev => prev.map(cust => 
-        cust._id === id ? response.data : cust
-      ));
+      setCustomers((prev) =>
+        prev.map((cust) => (cust._id === id ? response.data : cust))
+      );
       return response.data;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update customer');
+      setError(err.response?.data?.message || "Failed to update customer");
       throw err;
     }
   };
@@ -50,9 +54,9 @@ export const useCustomers = () => {
     try {
       setError(null);
       await customerService.deleteCustomer(id);
-      setCustomers(prev => prev.filter(cust => cust._id !== id));
+      setCustomers((prev) => prev.filter((cust) => cust._id !== id));
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to delete customer');
+      setError(err.response?.data?.message || "Failed to delete customer");
       throw err;
     }
   };
@@ -61,12 +65,26 @@ export const useCustomers = () => {
     try {
       setError(null);
       const response = await customerService.uploadNID(id, file);
-      setCustomers(prev => prev.map(cust => 
-        cust._id === id ? response.data : cust
-      ));
+      setCustomers((prev) =>
+        prev.map((cust) => (cust._id === id ? response.data : cust))
+      );
       return response.data;
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to upload NID');
+      setError(err.response?.data?.message || "Failed to upload NID");
+      throw err;
+    }
+  };
+
+  const uploadPhoto = async (id: string, file: File) => {
+    try {
+      setError(null);
+      const response = await customerService.uploadPhoto(id, file);
+      setCustomers((prev) =>
+        prev.map((cust) => (cust._id === id ? response.data : cust))
+      );
+      return response.data;
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to upload photo");
       throw err;
     }
   };
@@ -84,5 +102,6 @@ export const useCustomers = () => {
     updateCustomer,
     deleteCustomer,
     uploadNID,
+    uploadPhoto,
   };
 };
